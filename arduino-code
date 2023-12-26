@@ -1,0 +1,59 @@
+int led = 9;           // the PWM pin the LED is attached to
+int brightness = 0;    // how bright the LED is
+int fadeAmount = 5;    // how many points to fade the LED by
+int irt=13;
+int irx=2;
+int irst=0;
+int count =0;  
+int ir_signal = 38; // the frequency of the IR signal in kHz
+
+void setup() {
+  // put your setup code here, to run once:
+ pinMode(led, OUTPUT);
+ pinMode(irx,INPUT);
+ pinMode(irt,OUTPUT);
+ digitalWrite(led,LOW);
+
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+// set the brightness of pin 9:
+ irst=digitalRead(irx);
+ if(irst == HIGH){
+ transmit();
+ count++;
+delay(100);
+ if(count == 100){
+ transmit();
+analogWrite(led, 255);
+count = 0;
+ }
+ }
+irst = digitalRead(irx);
+ while(irst==LOW){ 
+transmit();
+count = 0;
+ analogWrite(led, 50);
+delay(5000);
+ irst = digitalRead(irx);
+ }  
+}
+
+
+void transmit(){
+  digitalWrite(irt, HIGH);
+  delayMicroseconds(13); // delay for 13 microseconds to transmit the start bit
+
+  // Transmit the IR signal with a frequency of 38 kHz
+  for (int i = 0; i < 32; i++) {
+    digitalWrite(irt, LOW);
+    delayMicroseconds(26); // delay for 13 microseconds to transmit a logical 0
+    digitalWrite(irt, HIGH);
+    delayMicroseconds(26); // delay for 13 microseconds to transmit a logical 1
+  }
+
+  // Turn off the IR LED to end the transmission
+  digitalWrite(irt, LOW);
+  delay(50); // delay for 50 milliseconds before transmitting the next signal
+}
